@@ -1,0 +1,913 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/jpg" 
+    href="53fb583d-2d0f-43d1-adef-9ffc5def9211.jpg">
+    <link rel="manifest" 
+    href="53fb583d-2d0f-43d1-adef-9ffc5def9211.jpg">
+    <meta name="theme-color" content="#0b1020">
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tuition Tracker">
+
+
+
+
+
+<title>YouTalk</title>
+
+
+<link rel="icon" id="favicon" type="image/svg+xml">
+<link rel="apple-touch-icon" id="appleIcon">
+<link rel="manifest" id="manifest">
+
+<style>
+:root{
+  --bg:#f3f5fa;--panel:#fff;--text:#172033;--muted:#758097;
+  --line:#e5e9f1;--primary:#536dfe;--bubble:#edf0ff;
+}
+body.dark{
+  --bg:#101522;--panel:#1b2333;--text:#f3f5fb;--muted:#aab4c7;
+  --line:#303b50;--primary:#8092ff;--bubble:#303c5c;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Arial,sans-serif;min-height:100dvh;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{
+  height:62px;background:var(--panel);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;position:sticky;top:0;z-index:10;
+}
+.brand{font-size:22px;font-weight:800;color:var(--primary)}
+.brand small{display:block;font-size:10px;color:var(--muted);font-weight:500}
+.top-actions{display:flex;gap:8px;align-items:center}
+.btn{
+  border:0;border-radius:10px;padding:10px 13px;
+  background:var(--primary);color:white;font-weight:600;
+}
+.btn.secondary{background:var(--bg);color:var(--text);border:1px solid var(--line)}
+.btn.danger{background:#e34c61}
+.icon-btn{
+  border:1px solid var(--line);background:var(--bg);color:var(--text);
+  border-radius:10px;padding:9px 11px;
+}
+#authScreen{
+  max-width:420px;margin:45px auto;padding:22px;
+}
+.panel{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:17px;padding:20px;
+}
+h2{margin-top:0}
+.field{margin:13px 0}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.field input,.field textarea,.search-input{
+  width:100%;padding:12px;border:1px solid var(--line);
+  border-radius:10px;background:var(--bg);color:var(--text);outline:none;
+}
+.field textarea{min-height:85px;resize:vertical}
+.full{width:100%}
+.switch-text{color:var(--primary);cursor:pointer;text-align:center;margin-top:17px}
+#appScreen{display:none}
+.layout{
+  display:grid;grid-template-columns:320px 1fr;
+  max-width:1150px;margin:18px auto;padding:0 12px;gap:15px;
+  height:calc(100dvh - 98px);
+}
+.sidebar,.chat-panel{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:16px;overflow:hidden;min-height:0;
+}
+.sidebar{display:flex;flex-direction:column}
+.side-heading{padding:16px;border-bottom:1px solid var(--line)}
+.side-heading h3{margin:0 0 12px}
+.search-input{margin-bottom:10px}
+.user-list{overflow:auto;padding:8px;flex:1}
+.user-item{
+  display:flex;align-items:center;gap:10px;padding:10px;
+  border-radius:12px;cursor:pointer;
+}
+.user-item:hover,.user-item.active{background:var(--bg)}
+.avatar{
+  width:43px;height:43px;border-radius:50%;background:var(--bubble);
+  color:var(--primary);display:flex;align-items:center;justify-content:center;
+  font-weight:800;flex-shrink:0;overflow:hidden;
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.user-info{min-width:0;flex:1}
+.user-info strong,.user-info small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-info small{color:var(--muted);margin-top:4px}
+.chat-panel{display:flex;flex-direction:column}
+.chat-empty{margin:auto;text-align:center;color:var(--muted);padding:25px}
+.chat-head{
+  padding:12px 15px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:10px;min-height:65px;
+}
+.chat-head .user-info{flex:1}
+.messages{
+  flex:1;overflow:auto;padding:16px;display:flex;
+  flex-direction:column;gap:9px;overscroll-behavior:contain;
+}
+.msg{
+  max-width:78%;padding:10px 13px;border-radius:15px;
+  background:var(--bubble);align-self:flex-start;
+  overflow-wrap:anywhere;white-space:pre-wrap;
+}
+.msg.mine{background:var(--primary);color:white;align-self:flex-end}
+.msg small{display:block;font-size:10px;opacity:.7;margin-top:5px;text-align:right}
+.composer{
+  padding:10px;border-top:1px solid var(--line);
+  display:flex;gap:8px;background:var(--panel);
+}
+.composer input{
+  min-width:0;flex:1;border:1px solid var(--line);border-radius:22px;
+  padding:12px 15px;background:var(--bg);color:var(--text);outline:none;
+}
+#profileModal{
+  display:none;position:fixed;inset:0;background:#0009;
+  z-index:30;align-items:center;justify-content:center;padding:15px;
+}
+.profile-card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:18px;width:100%;max-width:410px;padding:22px;
+  max-height:90dvh;overflow:auto;
+}
+.profile-top{text-align:center}
+.profile-avatar{
+  width:94px;height:94px;border-radius:50%;margin:5px auto 12px;
+  background:var(--bubble);color:var(--primary);font-size:30px;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-name{font-size:21px;font-weight:800}
+.profile-username{color:var(--muted);margin-top:5px}
+.profile-bio{padding:12px;background:var(--bg);border-radius:10px;margin:15px 0;white-space:pre-wrap}
+.profile-actions{display:flex;gap:8px;margin-top:14px}
+.profile-actions button{flex:1}
+#notice{font-size:13px;color:#e34c61;min-height:18px;margin-top:8px}
+.hidden{display:none!important}
+@media(max-width:700px){
+  .layout{display:block;margin:0;padding:0;height:calc(100dvh - 62px)}
+  .sidebar,.chat-panel{border-radius:0;border:0;height:100%}
+  .chat-panel{display:none}
+  .layout.chat-open .sidebar{display:none}
+  .layout.chat-open .chat-panel{display:flex}
+  .topbar{padding:0 10px}
+  .top-actions .btn{padding:9px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="brand">YouTalk <small>Powered by SFS</small></div>
+  <div class="top-actions">
+    <button class="icon-btn" id="themeBtn">☾</button>
+    <button class="btn secondary" id="profileBtn" style="display:none">Profile</button>
+    <button class="btn danger" id="logoutBtn" style="display:none">Logout</button>
+  </div>
+</header>
+
+<section id="authScreen">
+  <div class="panel">
+    <h2 id="authTitle">Welcome to YouTalk</h2>
+    <p style="color:var(--muted)">Chat privately with people.</p>
+
+    <div id="signupFields" class="hidden">
+      <div class="field">
+        <label>Your name</label>
+        <input id="signupName" placeholder="Your name">
+      </div>
+      <div class="field">
+        <label>Username (without spaces)</label>
+        <input id="signupUsername" placeholder="example123">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Email</label>
+      <input id="email" type="email" placeholder="Enter your email">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="password" type="password" placeholder="Enter password">
+    </div>
+
+    <button class="btn full" id="authSubmit">Login</button>
+    <div class="switch-text" id="authSwitch">New to YouTalk? Create Account</div>
+    <div id="authError"></div>
+  </div>
+</section>
+
+<section id="appScreen">
+  <div class="layout" id="layout">
+    <aside class="sidebar">
+      <div class="side-heading">
+        <h3>Messages</h3>
+        <input class="search-input" id="searchInput" placeholder="Search username...">
+        <div style="font-size:12px;color:var(--muted)">Search people to view their profile or chat.</div>
+      </div>
+      <div class="user-list" id="userList">
+        <p style="color:var(--muted);padding:12px">Your chats will appear here.</p>
+      </div>
+    </aside>
+
+    <main class="chat-panel" id="chatPanel">
+      <div class="chat-empty">Select a person to start chatting.</div>
+    </main>
+  </div>
+</section>
+
+<div id="profileModal">
+  <div class="profile-card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2 id="profileTitle">Profile</h2>
+      <button class="icon-btn" id="closeProfile">✕</button>
+    </div>
+
+    <div class="profile-top">
+      <div class="profile-avatar" id="profileAvatar">U</div>
+      <div class="profile-name" id="profileName"></div>
+      <div class="profile-username" id="profileUsername"></div>
+    </div>
+
+    <div id="profileDetails">
+      <div class="profile-bio" id="profileBio">No bio added yet.</div>
+      <div id="profileEmail" style="font-size:13px;color:var(--muted)"></div>
+    </div>
+
+    <div id="editProfileFields" class="hidden">
+      <div class="field">
+        <label>Name</label>
+        <input id="editName" maxlength="40">
+      </div>
+      <div class="field">
+        <label>Bio</label>
+        <textarea id="editBio" maxlength="160" placeholder="Write something about yourself"></textarea>
+      </div>
+      <div class="field">
+        <label>Profile photo URL</label>
+        <input id="editPhoto" type="url" placeholder="https://example.com/photo.jpg">
+      </div>
+      <p style="font-size:12px;color:var(--muted)">Photo URL দিলে ছবিটি Profile-এ দেখা যাবে।</p>
+    </div>
+
+    <div class="profile-actions">
+      <button class="btn secondary" id="editProfileBtn">Edit Profile</button>
+      <button class="btn" id="saveProfileBtn" style="display:none">Save</button>
+      <button class="btn" id="profileMessageBtn" style="display:none">Message</button>
+    </div>
+    <div id="profileError"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  onAuthStateChanged, signOut, deleteUser
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, collection,
+  query, where, orderBy, onSnapshot, addDoc, serverTimestamp,
+  runTransaction, getDocs, limit
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDqg_rfJK-rPi4TW-2iO9IgCzNL3VGKqSY",
+  authDomain: "youtalk-5747f.firebaseapp.com",
+  projectId: "youtalk-5747f",
+  storageBucket: "youtalk-5747f.firebasestorage.app",
+  messagingSenderId: "113958544756",
+  appId: "1:113958544756:web:8885b1bb64c7ebbde3b821"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentProfile = null;
+let activePerson = null;
+let activeChatId = null;
+let unsubscribeMessages = null;
+let unsubscribeChats = null;
+let signupMode = false;
+let profileSetupInProgress = false;
+let searchTimer = null;
+let profileTarget = null;
+let editingOwnProfile = false;
+
+const $ = id => document.getElementById(id);
+
+function showError(id, message){
+  $(id).textContent = message || "";
+}
+
+function safeText(value){
+  return String(value || "");
+}
+
+function avatarHTML(person){
+  const photo = safeText(person.photoURL);
+  const letter = safeText(person.name || person.username || "U").charAt(0).toUpperCase();
+  if(photo){
+    return `<div class="avatar"><img src="${escapeHTML(photo)}" alt="" onerror="this.parentElement.textContent='${escapeHTML(letter)}'"></div>`;
+  }
+  return `<div class="avatar">${escapeHTML(letter)}</div>`;
+}
+
+function escapeHTML(value){
+  return String(value || "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function formatTime(timestamp){
+  if(!timestamp || !timestamp.toDate) return "";
+  return timestamp.toDate().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+}
+
+function chatIdFor(uid1, uid2){
+  return [uid1, uid2].sort().join("_");
+}
+
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("youtalk-theme",
+    document.body.classList.contains("dark") ? "dark" : "light");
+  $("themeBtn").textContent = document.body.classList.contains("dark") ? "☀" : "☾";
+}
+
+if(localStorage.getItem("youtalk-theme") === "dark"){
+  document.body.classList.add("dark");
+  $("themeBtn").textContent = "☀";
+}
+$("themeBtn").addEventListener("click", toggleTheme);
+
+
+function setSignupMode(value){
+  signupMode = value;
+  $("signupFields").classList.toggle("hidden", !signupMode);
+  $("authTitle").textContent = signupMode ? "Create Your Account" : "Welcome to YouTalk";
+  $("authSubmit").textContent = signupMode ? "Create Account" : "Login";
+  $("authSwitch").textContent = signupMode
+    ? "Already have an account? Login"
+    : "New to YouTalk? Create Account";
+  showError("authError", "");
+}
+
+$("authSwitch").addEventListener("click", () => setSignupMode(!signupMode));
+
+$("authSubmit").addEventListener("click", async () => {
+  showError("authError", "");
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if(!email || !password){
+    showError("authError", "Email এবং Password দাও।");
+    return;
+  }
+
+  $("authSubmit").disabled = true;
+
+  try{
+    if(signupMode){
+      const name = $("signupName").value.trim();
+      const username = $("signupUsername").value.trim().toLowerCase();
+
+      if(!name || !username){
+        throw new Error("Name এবং Username পূরণ করো।");
+      }
+      if(!/^[a-z0-9_]{3,20}$/.test(username)){
+        throw new Error("Username 3-20 অক্ষরের হতে হবে। শুধু a-z, 0-9 ও _ ব্যবহার করো।");
+      }
+
+      profileSetupInProgress = true;
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = credential.user.uid;
+
+      try{
+        await runTransaction(db, async transaction => {
+          const usernameRef = doc(db, "usernames", username);
+          const usernameSnap = await transaction.get(usernameRef);
+          if(usernameSnap.exists()){
+            throw new Error("এই Username আগে থেকেই নেওয়া হয়েছে। অন্য Username দাও।");
+          }
+
+          transaction.set(usernameRef, {uid, username});
+          transaction.set(doc(db, "users", uid), {
+            uid, name, username, usernameLower:username,
+            email, bio:"", photoURL:"",
+            createdAt:serverTimestamp(),
+            lastSeen:serverTimestamp()
+          });
+        });
+
+        await startApp(credential.user);
+      }catch(error){
+        try{ await deleteUser(credential.user); }catch(e){}
+        throw error;
+      }finally{
+        profileSetupInProgress = false;
+      }
+
+    }else{
+      await signInWithEmailAndPassword(auth, email, password);
+    }
+  }catch(error){
+    showError("authError", friendlyError(error));
+  }finally{
+    $("authSubmit").disabled = false;
+  }
+});
+
+function friendlyError(error){
+  const code = error?.code || "";
+  if(code.includes("email-already-in-use")) return "এই Email দিয়ে আগে Account খোলা হয়েছে। Login করো।";
+  if(code.includes("invalid-credential") || code.includes("wrong-password")) return "Email অথবা Password ভুল হয়েছে।";
+  if(code.includes("user-not-found")) return "এই Email দিয়ে Account পাওয়া যায়নি।";
+  if(code.includes("weak-password")) return "Password কমপক্ষে ৬ অক্ষরের দাও।";
+  if(code.includes("permission-denied")) return "Firebase Rules-এ অনুমতি নেই। Firestore Rules পরীক্ষা করো।";
+  if(code.includes("network-request-failed")) return "Internet connection পরীক্ষা করো।";
+  return error?.message || "কিছু সমস্যা হয়েছে। আবার চেষ্টা করো।";
+}
+
+
+onAuthStateChanged(auth, async user => {
+  if(profileSetupInProgress) return;
+  if(user){
+    await startApp(user);
+  }else{
+    currentUser = null;
+    currentProfile = null;
+    $("authScreen").style.display = "block";
+    $("appScreen").style.display = "none";
+    $("profileBtn").style.display = "none";
+    $("logoutBtn").style.display = "none";
+    if(unsubscribeChats) unsubscribeChats();
+    if(unsubscribeMessages) unsubscribeMessages();
+  }
+});
+
+
+async function startApp(user){
+  currentUser = user;
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if(!userSnap.exists()){
+    showError("authError", "Profile পাওয়া যায়নি। Firebase Console-এ Users collection পরীক্ষা করো।");
+    return;
+  }
+
+  currentProfile = userSnap.data();
+  await updateDoc(userRef, {lastSeen:serverTimestamp()});
+
+  $("authScreen").style.display = "none";
+  $("appScreen").style.display = "block";
+  $("profileBtn").style.display = "inline-block";
+  $("logoutBtn").style.display = "inline-block";
+
+  listenChats();
+}
+
+$("logoutBtn").addEventListener("click", async () => {
+  if(!confirm("Logout করতে চাও?")) return;
+  if(unsubscribeMessages) unsubscribeMessages();
+  if(unsubscribeChats) unsubscribeChats();
+  await signOut(auth);
+});
+
+
+/* Profile features */
+
+function openProfile(person, own = false){
+  profileTarget = person;
+  editingOwnProfile = own;
+
+  $("profileModal").style.display = "flex";
+  $("profileTitle").textContent = own ? "My Profile" : "User Profile";
+  $("profileAvatar").innerHTML = person.photoURL
+    ? `<img src="${escapeHTML(person.photoURL)}" alt="Profile photo">`
+    : escapeHTML((person.name || person.username || "U").charAt(0).toUpperCase());
+
+  $("profileName").textContent = person.name || "User";
+  $("profileUsername").textContent = "@" + (person.username || "");
+  $("profileBio").textContent = person.bio || "No bio added yet.";
+  $("profileEmail").textContent = own ? (person.email || currentUser.email || "") : "";
+
+  $("profileDetails").classList.remove("hidden");
+  $("editProfileFields").classList.add("hidden");
+  $("editProfileBtn").style.display = own ? "block" : "none";
+  $("saveProfileBtn").style.display = "none";
+  $("profileMessageBtn").style.display = own ? "none" : "block";
+  showError("profileError", "");
+}
+
+$("profileBtn").addEventListener("click", () => {
+  if(currentProfile) openProfile(currentProfile, true);
+});
+
+$("closeProfile").addEventListener("click", () => {
+  $("profileModal").style.display = "none";
+});
+
+$("profileModal").addEventListener("click", e => {
+  if(e.target === $("profileModal")) $("profileModal").style.display = "none";
+});
+
+$("editProfileBtn").addEventListener("click", () => {
+  if(!profileTarget) return;
+  $("editName").value = profileTarget.name || "";
+  $("editBio").value = profileTarget.bio || "";
+  $("editPhoto").value = profileTarget.photoURL || "";
+
+  $("profileDetails").classList.add("hidden");
+  $("editProfileFields").classList.remove("hidden");
+  $("editProfileBtn").style.display = "none";
+  $("saveProfileBtn").style.display = "block";
+});
+
+$("saveProfileBtn").addEventListener("click", async () => {
+  const name = $("editName").value.trim();
+  const bio = $("editBio").value.trim();
+  const photoURL = $("editPhoto").value.trim();
+
+  if(!name){
+    showError("profileError", "Name খালি রাখা যাবে না।");
+    return;
+  }
+  if(photoURL && !/^https?:\/\//i.test(photoURL)){
+    showError("profileError", "Photo URL অবশ্যই http:// অথবা https:// দিয়ে শুরু হতে হবে।");
+    return;
+  }
+
+  $("saveProfileBtn").disabled = true;
+  try{
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      name, bio, photoURL
+    });
+
+    currentProfile = {...currentProfile, name, bio, photoURL};
+    openProfile(currentProfile, true);
+    listenChats();
+  }catch(error){
+    showError("profileError", friendlyError(error));
+  }finally{
+    $("saveProfileBtn").disabled = false;
+  }
+});
+
+$("profileMessageBtn").addEventListener("click", () => {
+  if(profileTarget){
+    const person = profileTarget;
+    $("profileModal").style.display = "none";
+    openChat(person);
+  }
+});
+
+
+/* Search users */
+
+$("searchInput").addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  const value = $("searchInput").value.trim().toLowerCase();
+  searchTimer = setTimeout(() => searchUsers(value), 350);
+});
+
+async function searchUsers(value){
+  if(!value){
+    listenChats();
+    return;
+  }
+  if(value.length < 2) return;
+
+  try{
+    const usersRef = collection(db, "users");
+    const q = query(
+      usersRef,
+      orderBy("usernameLower"),
+      where("usernameLower", ">=", value),
+      where("usernameLower", "<=", value + "\uf8ff"),
+      limit(15)
+    );
+
+    const snap = await getDocs(q);
+    const people = snap.docs
+      .map(d => d.data())
+      .filter(person => person.uid !== currentUser.uid);
+
+    renderPeople(people);
+  }catch(error){
+    $("userList").textContent = "Search error: " + friendlyError(error);
+  }
+}
+
+function renderPeople(people){
+  const list = $("userList");
+  list.innerHTML = "";
+
+  if(!people.length){
+    list.innerHTML = '<p style="padding:12px;color:var(--muted)">কোনো User পাওয়া যায়নি।</p>';
+    return;
+  }
+
+  people.forEach(person => {
+    const item = document.createElement("div");
+    item.className = "user-item";
+    item.innerHTML = `
+      ${avatarHTML(person)}
+      <div class="user-info">
+        <strong>${escapeHTML(person.name || "User")}</strong>
+        <small>@${escapeHTML(person.username || "")}</small>
+      </div>
+      <button class="icon-btn profile-open">Profile</button>
+    `;
+    item.querySelector(".profile-open").addEventListener("click", e => {
+      e.stopPropagation();
+      openProfile(person, false);
+    });
+    item.addEventListener("click", () => openChat(person));
+    list.appendChild(item);
+  });
+}
+
+
+/* Chat list */
+
+function listenChats(){
+  if(!currentUser) return;
+  if(unsubscribeChats) unsubscribeChats();
+
+  const q = query(
+    collection(db, "chats"),
+    where("participants", "array-contains", currentUser.uid)
+  );
+
+  unsubscribeChats = onSnapshot(q, async snapshot => {
+    const chats = snapshot.docs.map(d => ({id:d.id, ...d.data()}));
+    chats.sort((a,b) => {
+      const ta = a.updatedAt?.toMillis?.() || 0;
+      const tb = b.updatedAt?.toMillis?.() || 0;
+      return tb - ta;
+    });
+
+    const people = [];
+    for(const chat of chats){
+      const otherUid = (chat.participants || []).find(id => id !== currentUser.uid);
+      if(!otherUid) continue;
+      const personSnap = await getDoc(doc(db, "users", otherUid));
+      if(personSnap.exists()){
+        people.push({...personSnap.data(), lastMessage:chat.lastMessage || ""});
+      }
+    }
+
+    if(!$("searchInput").value.trim()) renderPeople(people);
+  }, error => {
+    $("userList").textContent = friendlyError(error);
+  });
+}
+
+
+/* One-to-one messaging */
+
+async function openChat(person){
+  if(!currentUser || !person?.uid) return;
+
+  activePerson = person;
+  activeChatId = chatIdFor(currentUser.uid, person.uid);
+
+  $("layout").classList.add("chat-open");
+
+  if(unsubscribeMessages) unsubscribeMessages();
+
+  $("chatPanel").innerHTML = `
+    <div class="chat-head">
+      <button class="icon-btn mobile-back" id="backBtn">‹</button>
+      ${avatarHTML(person)}
+      <div class="user-info">
+        <strong>${escapeHTML(person.name || "User")}</strong>
+        <small>@${escapeHTML(person.username || "")}</small>
+      </div>
+      <button class="icon-btn" id="chatProfileBtn">Profile</button>
+    </div>
+    <div class="messages" id="messages">
+      <div class="chat-empty">Loading messages...</div>
+    </div>
+    <form class="composer" id="messageForm">
+      <input id="messageInput" maxlength="5000" autocomplete="off" placeholder="Write a message...">
+      <button class="btn" type="submit">Send</button>
+    </form>
+  `;
+
+  $("backBtn").addEventListener("click", () => {
+    $("layout").classList.remove("chat-open");
+  });
+  $("chatProfileBtn").addEventListener("click", () => openProfile(person, false));
+
+  $("messageForm").addEventListener("submit", sendMessage);
+
+  const chatRef = doc(db, "chats", activeChatId);
+  await setDoc(chatRef, {
+    participants:[currentUser.uid, person.uid].sort(),
+    updatedAt:serverTimestamp()
+  }, {merge:true});
+
+  const messagesQuery = query(
+    collection(db, "chats", activeChatId, "messages"),
+    orderBy("createdAt", "asc"),
+    limit(200)
+  );
+
+  unsubscribeMessages = onSnapshot(messagesQuery, snapshot => {
+    const box = $("messages");
+    if(!box) return;
+
+    const wasNearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+    box.innerHTML = "";
+
+    if(snapshot.empty){
+      box.innerHTML = '<div class="chat-empty">Say hello and start your conversation.</div>';
+      return;
+    }
+
+    snapshot.forEach(messageDoc => {
+      const message = messageDoc.data();
+      const mine = message.senderId === currentUser.uid;
+      const div = document.createElement("div");
+      div.className = "msg" + (mine ? " mine" : "");
+      div.textContent = message.text || "";
+
+      const time = document.createElement("small");
+      time.textContent = formatTime(message.createdAt);
+      div.appendChild(time);
+      box.appendChild(div);
+    });
+
+    if(wasNearBottom) box.scrollTop = box.scrollHeight;
+  }, error => {
+    $("messages").textContent = friendlyError(error);
+  });
+
+  setTimeout(() => {
+    const input = $("messageInput");
+    if(input && window.innerWidth <= 700) input.focus();
+  }, 250);
+}
+
+async function sendMessage(event){
+  event.preventDefault();
+  const input = $("messageInput");
+  const text = input.value.trim();
+
+  if(!text || !activeChatId || !activePerson) return;
+
+  input.value = "";
+
+  try{
+    const chatRef = doc(db, "chats", activeChatId);
+    const messagesRef = collection(db, "chats", activeChatId, "messages");
+
+    await addDoc(messagesRef, {
+      text,
+      senderId:currentUser.uid,
+      createdAt:serverTimestamp()
+    });
+
+    await updateDoc(chatRef, {
+      lastMessage:text.slice(0,100),
+      lastMessageAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+  }catch(error){
+    input.value = text;
+    alert("Message পাঠানো যায়নি: " + friendlyError(error));
+  }
+}
+
+
+/* Mobile keyboard layout */
+
+if(window.visualViewport){
+  const adjustViewport = () => {
+    document.documentElement.style.setProperty(
+      "--visible-height",
+      window.visualViewport.height + "px"
+    );
+  };
+  window.visualViewport.addEventListener("resize", adjustViewport);
+  window.visualViewport.addEventListener("scroll", adjustViewport);
+  adjustViewport();
+}
+
+
+
+
+/* =================================
+   YouTalk Y LOGO
+================================= */
+
+const logoSVG = `
+<svg xmlns="http://www.w3.org/2000/svg"
+width="512" height="512" viewBox="0 0 512 512">
+
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0%" stop-color="#2563eb"/>
+<stop offset="100%" stop-color="#101827"/>
+</linearGradient>
+</defs>
+
+<rect width="512" height="512" rx="110" fill="url(#bg)"/>
+
+<rect x="32" y="32" width="448" height="448"
+rx="90" fill="none"
+stroke="#ffffff"
+stroke-opacity=".22"
+stroke-width="8"/>
+
+<text x="256" y="265"
+font-family="Arial,sans-serif"
+font-size="270"
+font-weight="bold"
+fill="white"
+text-anchor="middle"
+dominant-baseline="middle">T</text>
+
+<text x="256" y="405"
+font-family="Arial,sans-serif"
+font-size="36"
+font-weight="bold"
+fill="#bfdbfe"
+text-anchor="middle">TUITION</text>
+
+</svg>
+`;
+
+const logoURL =
+"data:image/svg+xml;charset=utf-8,"+
+encodeURIComponent(logoSVG);
+
+document.getElementById("favicon").href=logoURL;
+document.getElementById("appleIcon").href=logoURL;
+
+
+/* APP MANIFEST */
+
+const manifest={
+name:"YouTalk",
+short_name:"YouTalk",
+description:"YouTalk",
+start_url:".",
+display:"standalone",
+background_color:"#101827",
+theme_color:"#101827",
+icons:[
+{
+src:logoURL,
+sizes:"192x192",
+type:"image/svg+xml"
+},
+{
+src:logoURL,
+sizes:"512x512",
+type:"image/svg+xml",
+purpose:"any maskable"
+}
+]
+};
+
+const manifestBlob=new Blob(
+[JSON.stringify(manifest)],
+{type:"application/manifest+json"}
+);
+
+document.getElementById("manifest").href=
+URL.createObjectURL(manifestBlob);
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
